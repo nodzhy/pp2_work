@@ -1,0 +1,8 @@
+a=0
+while(True):
+    x = input()
+    a+=x
+    if(x == ''):
+        break
+    
+print(a)
