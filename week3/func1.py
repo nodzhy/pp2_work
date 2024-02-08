@@ -37,18 +37,15 @@ def prime(n):
 """
 #task 5
 """
-def permutations(s):
-    def generate(current, remaining):
-        if len(remaining) == 1:
-            print(current + remaining[0])
-        else:
-            for i in range(len(remaining)):
-                new_current = current + remaining[i]
-                new_remaining = remaining[:i] + remaining[i+1:]
-                generate(new_current, new_remaining)
-    generate("", s)
-s = input()
-permutations(s)
+from itertools import permutations as permute
+
+def generate_permutations():
+    text = input("Введите текст: ")
+    permutations = permute(text)
+    for perm in permutations:
+        print(''.join(perm))
+
+generate_permutations()
 """
 #task 6
 """
