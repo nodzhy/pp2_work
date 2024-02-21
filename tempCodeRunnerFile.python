@@ -1,17 +1,27 @@
-import matplotlib.pyplot as plt
+import json
+import os
 
-# Example data representing a distribution
-x = [1, 2, 3, 4, 5]
-y = [10, 20, 15, 25, 30]
+print("Interface Status")
+print("================================================================================")
+print("DN                                                 Description           Speed    MTU")  
+print("-------------------------------------------------- --------------------  ------  ------")
 
-# Create a line plot
-plt.plot(x, y, marker='o', linestyle='-')
-
-# Add labels and title
-plt.xlabel('X-axis')
-plt.ylabel('Y-axis')
-plt.title('Line Plot of Distribution')
-
-# Display the plot
-plt.grid(True)
-plt.show()
+# Проверяем существование файла
+if os.path.exists("sample-data.json"):
+    with open("sample-data.json", "r") as file:
+        json_data = json.load(file)
+    iamdata = json_data.get("imdata", [])
+    for item in iamdata:
+        nt_item = item.get("l1PhysIf", {})
+        att = nt_item.get("attributes", {})
+        dn = att.get("dn", "")
+        speed = att.get("speed", "")
+        mtu = att.get("mtu", "")
+        output = ""
+        if len(dn) == 42:
+            output += dn + " " * 30 + speed + "   " + mtu
+        else:
+            output += dn + " " * 31 + speed + "   " + mtu
+        print(output)
+else:
+    print("Файл sample-data.json не найден.")
