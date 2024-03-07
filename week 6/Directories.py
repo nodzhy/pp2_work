@@ -23,11 +23,13 @@ if path_check==True:
      print("Files:", ', '.join([name for name in os.listdir(path) if not os.path.isdir(os.path.join(path, name))]))
 else:
      print("such file not found")
-     """
+"""
 #task 4
+'''
 with open("builtin.py", "r") as file:
     x = len(file.readlines())
     print("Number of lines:", x)
+'''
 #task 5
 """48-
 my_list=["apple", "banana", "orange", "milk"]
