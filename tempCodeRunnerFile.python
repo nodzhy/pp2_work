@@ -1,41 +1,50 @@
 import pygame 
-from datetime import datetime
 pygame.init()
-L, H=1200, 800
-done=False 
-screen=pygame.display.set_mode((L, H)) 
+done = False
+L, H = 1200, 800
+screen = pygame.display.set_mode((L, H))
+player_png = pygame.image.load("C:/Users/Admin/Desktop/labs/week1/week 7/player.png")
 
-clock_png=pygame.image.load("C:/Users/Admin/Desktop/labs/week1/week 7/mainclock.png")
-minute_png=pygame.image.load("C:/Users/Admin/Desktop/labs/week1/week 7/rightarm.png")
-second_png=pygame.image.load("C:/Users/Admin/Desktop/labs/week1/week 7/leftarm.png")
+music1 = pygame.mixer.Sound("C:/Users/Admin/Desktop/labs/week1/week 7/Голая.mp3")
+music2 = pygame.mixer.Sound("C:/Users/Admin/Desktop/labs/week1/week 7/Романс.mp3")
+music3 = pygame.mixer.Sound("C:/Users/Admin/Desktop/labs/week1/week 7/Seven.mp3")
+music4 = pygame.mixer.Sound("C:/Users/Admin/Desktop/labs/week1/week 7/Любите Девушки.mp3")
 
-clock_place=clock_png.get_rect(center=(L/2, H/2))
-minute_place=minute_png.get_rect(center=(L/2, H/2))
-second_place=second_png.get_rect(center=(L/2, H/2))
+music_list = [music1, music2, music3, music4]
 
-clock=pygame.time.Clock
+player_place = player_png.get_rect(center=(L/2, H/2))
+
+current_music_index = 0
+paused = False
 
 while not done:
     for event in pygame.event.get():
-        if event.type==pygame.QUIT:
+        if event.type == pygame.QUIT:
             done = True
 
+    keys = pygame.key.get_pressed()
+    
+    if keys[pygame.K_RIGHT]:
+        music_list[current_music_index].stop()  
+        current_music_index = (current_music_index + 1) % len(music_list)
+        music_list[current_music_index].play()
+        paused = False
+    
+    elif keys[pygame.K_LEFT]:
+        music_list[current_music_index].stop()
+        current_music_index = (current_music_index - 1) % len(music_list)
+        music_list[current_music_index].play()
+        paused = False
+
+    elif keys[pygame.K_SPACE]:
+        if not paused:
+            pygame.mixer.pause()
+            paused = True
+        else:
+            pygame.mixer.unpause()
+            paused = False
+
     screen.fill((255, 255, 255))
-    screen.blit(clock_png, clock_place)
+    screen.blit(player_png, player_place)
 
-    now = datetime.now() 
-    time_now=now.time()
-    minute_now=time_now.minute
-    second_now=time_now.second
-
-    minute_angl=(minute_now*6)-36
-    second_angle=(second_now*6)+4.5
-
-    rotate_minute=pygame.transform.rotate(minute_png, -minute_angl)
-    rotate_second=pygame.transform.rotate(second_png, -second_angle)
-
-    screen.blit(rotate_minute, rotate_minute.get_rect(center=minute_place.center))
-    screen.blit(rotate_second, rotate_second.get_rect(center=second_place.center))
-
-pygame.display.flip()
-clock.tick(60)
+    pygame.display.flip()
