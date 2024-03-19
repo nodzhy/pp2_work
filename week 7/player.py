@@ -2,7 +2,6 @@ import pygame
 pygame.init()
 done = False
 paused = False
-x=0
 L, H = 1200, 800
 screen = pygame.display.set_mode((L, H))
 
