@@ -12,7 +12,7 @@ music2 = pygame.mixer.Sound("C:/Users/Admin/Desktop/labs/week1/week 7/Роман
 music3 = pygame.mixer.Sound("C:/Users/Admin/Desktop/labs/week1/week 7/Seven.mp3")
 music4 = pygame.mixer.Sound("C:/Users/Admin/Desktop/labs/week1/week 7/Любите Девушки.mp3")
 
-music_list = [music1, music2, music3, music4]
+music_list = [music1, music3, music2, music4]
 
 player_place = player_png.get_rect(center=(L/2, H/2))
 
