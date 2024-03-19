@@ -2,10 +2,10 @@ import pygame
 pygame.init()
 done = False
 paused = False
-L, H = 1200, 800
+L, H = 700, 500
 screen = pygame.display.set_mode((L, H))
 
-player_png = pygame.image.load("C:/Users/Admin/Desktop/labs/week1/week 7/player.png")
+player_png = pygame.image.load("C:/Users/Admin/Desktop/labs/week1/week 7/ih.png")
 
 music1 = pygame.mixer.Sound("C:/Users/Admin/Desktop/labs/week1/week 7/Голая.mp3")
 music2 = pygame.mixer.Sound("C:/Users/Admin/Desktop/labs/week1/week 7/Романс.mp3")
