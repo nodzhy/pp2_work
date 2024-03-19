@@ -47,6 +47,8 @@ while not done:
             pygame.mixer.unpause()
             paused = False
 
+    else:
+        music_list[current_music_index].play()
 
     screen.fill((255, 255, 255))
     screen.blit(player_png, player_place)
