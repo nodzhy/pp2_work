@@ -7,12 +7,13 @@ screen = pygame.display.set_mode((L, H))
 
 player_png = pygame.image.load("C:/Users/Admin/Desktop/labs/week1/week 7/ih.png")
 
+music = pygame.mixer.Sound("C:/Users/Admin/Desktop/labs/week1/week 7/3d.mp3")
 music1 = pygame.mixer.Sound("C:/Users/Admin/Desktop/labs/week1/week 7/Голая.mp3")
 music2 = pygame.mixer.Sound("C:/Users/Admin/Desktop/labs/week1/week 7/Романс.mp3")
 music3 = pygame.mixer.Sound("C:/Users/Admin/Desktop/labs/week1/week 7/Seven.mp3")
 music4 = pygame.mixer.Sound("C:/Users/Admin/Desktop/labs/week1/week 7/Любите Девушки.mp3")
 
-music_list = [music1, music3, music2, music4]
+music_list = [music, music1, music3, music2, music4]
 
 player_place = player_png.get_rect(center=(L/2, H/2))
 
