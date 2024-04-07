@@ -106,7 +106,7 @@ while not done:
         pass
 
     text_surface = font.render(f'POINT: {cnt}', True, colorRED)  # Создание текстовой поверхности
-    screen.blit(text_surface, (10, 10))  # Отображение текстовой поверхности на экране
+    screen.blit(text_surface, (270, 10))  # Отображение текстовой поверхности на экране
         
     pygame.display.flip()
     clock.tick(FPS)
