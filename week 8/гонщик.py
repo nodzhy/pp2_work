@@ -103,10 +103,14 @@ while not done:
     
     if pygame.sprite.spritecollideany(P1, coins):
         cnt+=1
-        pass
+        coin = pygame.sprite.spritecollide(P1, coins, True)  # Получить список монет, с которыми столкнулся игрок и удалить их
+        coin[0].kill()  # Удалить первую монетку из списка
+        A1 = COIN() # Добавить новую монетку в группу монеток
+        coins.add(A1)
+        all_sprites.add(A1)
 
     text_surface = font.render(f'POINT: {cnt}', True, colorRED)  # Создание текстовой поверхности
-    screen.blit(text_surface, (270, 10))  # Отображение текстовой поверхности на экране
+    screen.blit(text_surface, (250, 10))  # Отображение текстовой поверхности на экране
         
     pygame.display.flip()
     clock.tick(FPS)
