@@ -1,3 +1,0 @@
-
-
-    pygame.display.flip()
