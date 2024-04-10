@@ -44,14 +44,14 @@ big_fruit_timer = 0
 fruit_change_interval = 500  
 
 # Отображение счета
-def show_score(choice, color, font, size):
+def show_score(a, color, font, size):
     score_font = pygame.font.SysFont(font, size)
     score_surface = score_font.render('Счет : ' + str(score), True, color)
     score_rect = score_surface.get_rect()
     game_window.blit(score_surface, score_rect) 
 
 # Отображение времени большого фрукта
-def show_time(choice, color, font, size):
+def show_time(a, color, font, size):
     time_font = pygame.font.SysFont(font, size)
     time_surface = time_font.render("time: "+str(big_fruit_timer) + "/500", True, color)
     time_rect = time_surface.get_rect()
