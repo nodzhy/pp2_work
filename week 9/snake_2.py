@@ -23,6 +23,7 @@ fps = pygame.time.Clock()
 # Позиция и начальное тело змеи
 snake_position = [100, 50]
 snake_body = [[100, 50], [90, 50], [80, 50], [70, 50]]
+speed = 0
 
 # Позиции фруктов и больших фруктов
 fruit_position = [random.randrange(1, (window_width // 10)) * 10, random.randrange(1, (window_height // 10)) * 10]
@@ -131,6 +132,7 @@ while True:
     snake_body.insert(0, list(snake_position))
     if snake_position[0] == fruit_position[0] and snake_position[1] == fruit_position[1]:
         score += 10
+        speed=0.01
         fruit_spawn = False
     else:
         snake_body.pop()
@@ -144,6 +146,7 @@ while True:
     snake_body.insert(0, list(snake_position))
     if snake_head_rect.colliderect(big_fruit_rect):
         score += 15
+        speed=0.02
         big_fruit_spawn = False
         big_fruit_timer = 0
     else:
@@ -170,6 +173,8 @@ while True:
 
     # Обновление экрана
     pygame.display.update()
+
+    snake_speed+=speed
 
     # Частота обновления кадров
     fps.tick(snake_speed)

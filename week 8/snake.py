@@ -42,6 +42,7 @@ change_to = direction
 
 # начальная оценка
 score = 0
+speed=0
 
 fruit_time = 5
 
@@ -126,6 +127,7 @@ while True :
     snake_body.insert(0, list(snake_position))
     if snake_position[0] == fruit_position[0] and snake_position[1] == fruit_position[1] :
         score += 10
+        speed += 0.005
         fruit_spawn = False
     else :
         snake_body.pop()
@@ -156,6 +158,8 @@ while True :
 
     # Refresh game screen
     pygame.display.update()
+
+    snake_speed+=speed
 
     # Frame Per Second /Refresh Rate
     fps.tick(snake_speed)
