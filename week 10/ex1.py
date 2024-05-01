@@ -1,11 +1,8 @@
 import psycopg2
 import csv
 
-conn = psycopg2.connect(
-    host="localhost",
-    database="postgres",
-    user="postgres",
-    password="admin"
+conn = psycopg2.connect(host="localhost", port = "5432", database= "test2", 
+                        user= "postgres", password = "Nurban17."
 )
 
 cur = conn.cursor()
@@ -16,7 +13,7 @@ def inputData():
     cur.execute(' INSERT INTO postgres.public.phone_book("PersonName", "PhoneNumber") VALUES( %s, %s); ' , (name, number))
 
 def importFromCSV():
-    with open("info.csv", 'r') as file:
+    with open("C:/Users/Admin/Desktop/labs/week1/week 10/info.csv", 'r') as file:
         reader = csv.reader(file)
         for row in reader:
             personName, phoneNumber = row
@@ -29,7 +26,7 @@ def update_contact(personName, phoneNumber):
 def queryData():
     cur.execute(' SELECT * FROM postgres.public.phone_book ')
     data = cur.fetchall()
-    path = r"C:\Users\Аскар\Desktop\code\python\Lab10\phonebook\queredData.txt"
+    path = r"C:/Users/Admin/Desktop/labs/week1/week 10/book.txt"
 
     f = open(path, "w")
     for row in data:
