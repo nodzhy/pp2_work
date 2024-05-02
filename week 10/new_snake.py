@@ -29,7 +29,7 @@ class Snake:
     def drawingSnake(self):
         for block in self.body: # the for loop that iterate our list of cooredinates of snake elements
             body_rect = pygame.Rect(block.x * cell_size, block.y * cell_size, cell_size, cell_size) # creating rectangle of the snake elements
-            pygame.draw.rect(screen, (0 ,128 ,0), body_rect) # drawing the rectangles
+            pygame.draw.rect(screen, (0 ,255 ,0), body_rect) # drawing the rectangles
         snake_head = pygame.Rect(self.body[0].x * cell_size, self.body[0].y * cell_size, cell_size, cell_size)
         headTexture = pygame.image.load('C:/Users/Admin/Desktop/labs/week1/week 10/snakehead.png')
         headTexture = pygame.transform.scale(headTexture, (40, 40))
