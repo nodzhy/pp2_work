@@ -1,253 +1,325 @@
 import pygame
-import time
+from pygame.math import Vector2
+import datetime
 import random
+import psycopg2 
+import pygame_menu
 
-print ("напишите свой логин")
-login=str(input())
-
-# Настройки игры
-snake_speed = 15
-window_width = 720
-window_height = 480
-
-# Цвета
-black = pygame.Color(0, 0, 0)
-white = pygame.Color(255, 255, 255)
-red = pygame.Color(255, 0, 0)
-green = pygame.Color(0, 255, 0)
-blue = pygame.Color(0, 0, 255)
-yellow = pygame.Color(255, 255, 0)
-
-# Инициализация Pygame
 pygame.init()
-pygame.display.set_caption('Змейка')
-game_window = pygame.display.set_mode((window_width, window_height))
-fps = pygame.time.Clock()
 
-# Пауза
-paused=False
-pause_icon = pygame.image.load('C:/Users/Admin/Desktop/labs/week1/week 10/пауза.png')
-resume_icon = pygame.image.load('C:/Users/Admin/Desktop/labs/week1/week 10/resume.png')
-icon_rect = pause_icon.get_rect()
-icon_rect.center = (window_width // 2 + 20, window_height // 2)
+conn = psycopg2.connect(
+    host="localhost",
+    database="pp2",
+    user="postgres",
+    password="Nurban17."
+)
 
-# Позиция и начальное тело змеи
-snake_position = [100, 50]
-snake_body = [[100, 50], [90, 50], [80, 50], [70, 50]]
-speed = 0
-level = 1 
-
-# Позиции фруктов и больших фруктов
-fruit_position = [random.randrange(1, (window_width // 10)) * 10-20, random.randrange(1, (window_height // 10)) * 10-20]
-big_fruit_position = [random.randrange(1, (window_width // 10)) * 10, random.randrange(1, (window_height // 10)) * 10]
-walls = []
-a=random.randint(20, 100)
-b=random.randint(20, 100)
-
-def create_wall():
-    # Генерируем случайные координаты для новой стены
-    wall_position = [random.randrange(1, (window_width // 10)) * 10 - 100, random.randrange(1, (window_height // 10)) * 10 - 100]
-    # Добавляем стену в список
-    walls.append(wall_position)
-
-# Отображение всех стен
-def draw_walls():
-    for wall in walls:
-        pygame.draw.rect(game_window, yellow, pygame.Rect(wall[0], wall[1], a, b))
-
-# Флаги появления фруктов и больших фруктов
-fruit_spawn = True
-big_fruit_spawn = True
-
-# Направление змеи с самого начала
-direction = 'RIGHT'
-change_to = direction
-
-# Счет
-score = 0
-
-# Таймер для большого фрукта
-big_fruit_timer = 0
-fruit_change_interval = 500  
-
-# Отображение счета
-def show_score(a, color, font, size):
-    score_font = pygame.font.SysFont(font, size)
-    score_surface = score_font.render('Счет : ' + str(score), True, color)
-    score_rect = score_surface.get_rect()
-    game_window.blit(score_surface, score_rect) 
-
-# Отображение времени большого фрукта
-def show_time(a, color, font, size):
-    time_font = pygame.font.SysFont(font, size)
-    time_surface = time_font.render("time: "+str(big_fruit_timer) + "/500", True, color)
-    time_rect = time_surface.get_rect()
-    #место где будет стоять счетчик
-    time_rect.topright = (window_width - 10, 1)
-    game_window.blit(time_surface, time_rect)
-
-# Отображение Логина
-def show_login(a, color, font, size):
-    login_font = pygame.font.SysFont(font, size)
-    login_surface = login_font.render("login: "+str(login), True, color)
-    login_rect = login_surface.get_rect()
-    #место где будет стоять счетчик
-    login_rect.topright = (360, 1)
-    game_window.blit(login_surface, login_rect)
-
-# Отображение Уровня
-def show_level(a, color, font, size):
-    level_font = pygame.font.SysFont(font, size)
-    level_surface = level_font.render("level: "+str(level), True, color)
-    level_rect = level_surface.get_rect()
-    #место где будет стоять счетчик
-    level_rect.topright = (500, 1)
-    game_window.blit(level_surface, level_rect)
-
-# Завершение игры
-def game_over():
-    game_over_font = pygame.font.SysFont('times new roman', 50)
-    game_over_surface = game_over_font.render('Loser, you have only: ' + str(score), True, red)
-    game_over_rect = game_over_surface.get_rect()
-    game_over_rect.midtop = (window_width / 2, window_height / 4)
-    game_window.blit(game_over_surface, game_over_rect)
-    pygame.display.flip()
-    time.sleep(2)
-    pygame.quit()
-    quit()
-
-# Основной цикл игры
-while True:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            quit()
-        
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_SPACE:
-                paused = not paused
-
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_UP:
-                change_to = 'UP'
-            if event.key == pygame.K_DOWN:
-                change_to = 'DOWN'
-            if event.key == pygame.K_LEFT:
-                change_to = 'LEFT'
-            if event.key == pygame.K_RIGHT:
-                change_to = 'RIGHT'
+cur = conn.cursor()
 
 
-    if not paused:
-             # Избегаем двойного изменения направленияe
-        if change_to == 'UP' and direction != 'DOWN':
-            direction = 'UP'
-        if change_to == 'DOWN' and direction != 'UP':
-            direction = 'DOWN'
-        if change_to == 'LEFT' and direction != 'RIGHT':
-            direction = 'LEFT'
-        if change_to == 'RIGHT' and direction != 'LEFT':
-            direction = 'RIGHT'
 
-        # Перемещение змеи
-        if direction == 'UP':
-            snake_position[1] -= (10)
-        if direction == 'DOWN':
-            snake_position[1] += (10)
-        if direction == 'LEFT':
-            snake_position[0] -= (10)
-        if direction == 'RIGHT':
-            snake_position[0] += (10)
+# creating a snake class 
+class Snake:
+    def __init__(self):
+        self.body = [Vector2(7, 10), Vector2(6, 10), Vector2(5, 10)] # head, and body elements of the snake
+        self.eated = False # checker for snake eated the fruit or not
+        self.isDead = False # check snake dead or not
 
-        # Обновление таймера для большого фрукта
-        big_fruit_timer += fps.get_rawtime()
+    # drawing our snake
+    def drawingSnake(self):
+        for block in self.body: # the for loop that iterate our list of cooredinates of snake elements
+            body_rect = pygame.Rect(block.x * cell_size, block.y * cell_size, cell_size, cell_size) # creating rectangle of the snake elements
+            pygame.draw.rect(screen, (0 ,128 ,0), body_rect) # drawing the rectangles
+        snake_head = pygame.Rect(self.body[0].x * cell_size, self.body[0].y * cell_size, cell_size, cell_size)
+        headTexture = pygame.image.load('C:/Users/Admin/Desktop/labs/week1/week 10/snakehead.png')
+        headTexture = pygame.transform.scale(headTexture, (40, 40))
+        screen.blit(headTexture, snake_head)
 
-        # Если прошло больше 5 секунд, меняем положение большого фрукта и сбрасываем таймер
-        if big_fruit_timer > fruit_change_interval:
-            big_fruit_position = [random.randrange(1, (window_width // 10)) * 10, random.randrange(1, (window_height // 10)) * 10]
-            big_fruit_timer = 0
-
-        # Проверка столкновений змеи
-        if snake_position[0] < 0 or snake_position[0] > window_width - 10:
-            game_over()
-        if snake_position[1] < 0 or snake_position[1] > window_height - 10:
-            game_over()
-            
-        # Проверка столкновения с собственным телом
-        for block in snake_body[1:]:
-            if snake_position[0] == block[0] and snake_position[1] == block[1]:
-                game_over()
-
-        # Ув уровня
-        if score>=100 and score <200:
-            level=2
-
-        if score>=200 and score <300:
-            level=3
-        
-        if score>=300 and score <400:
-            level=4
-
-        if score>=400:
-            level=5
-
-        # Перемещение тела змеи и проверка съедания фруктов
-        snake_body.insert(0, list(snake_position))
-        if snake_position[0] == fruit_position[0] and snake_position[1] == fruit_position[1]:
-            score += 10
-            speed=0.01
-            fruit_spawn = False
+    # the moving of our snake
+    def snakeMoving(self):
+        if self.eated == True: # if snake eated the fruit
+            body_copy = self.body[:] # take the copy of the snake
+            body_copy.insert(0, body_copy[0] + direction) # adding the one element
+            self.body = body_copy[:] 
+            self.eated = False
         else:
-            snake_body.pop()
-        if not fruit_spawn:
-            fruit_position = [random.randrange(1, (window_width // 10)) * 10, random.randrange(1, (window_height // 10)) * 10]
+            body_copy = self.body[:-1] # taking the copy of the snake except the last element
+            body_copy.insert(0, body_copy[0] + direction) # adding one element at index 0 this element is our head + direction
+            self.body = body_copy[:]
 
-        # Проверка съедания большого фрукта
-        snake_head_rect = pygame.Rect(snake_position[0], snake_position[1], 10, 10)
-        big_fruit_rect = pygame.Rect(big_fruit_position[0], big_fruit_position[1], 15, 15)
-        snake_body.insert(0, list(snake_position))
-        if snake_head_rect.colliderect(big_fruit_rect):
-            random_number = random.randint(10, 20)
-            score += random_number
-            speed=0.02
-            big_fruit_spawn = False
-            big_fruit_timer = 0
+# creating our Fruit class
+class Fruit:
+    def __init__(self):
+        self.randomize() # the method that spawns our fruit at the random position
+    
+    def drawingFruit(self):
+        fruit_rect = pygame.Rect(self.pos.x * cell_size, self.pos.y * cell_size, cell_size, cell_size) 
+        self.food = pygame.image.load('C:/Users/Admin/Desktop/labs/week1/week 10/food1.png') # spawning random fruit
+        self.food = pygame.transform.scale(self.food, (35, 35)) # scale the image
+        # pygame.draw.rect(screen, (107 ,142 ,35), fruit_rect)
+        screen.blit(self.food, fruit_rect)
+
+    def randomize(self):
+        self.x = random.randint(0, cell_number - 2) # random cell between 0 - 18, whu 18 because if it will be bigger, the fruit will spawn on the borders 
+        self.y = random.randint(0, cell_number - 2) 
+        self.pos = Vector2(self.x, self.y)
+        self.randomFood = random.randint(1, 3) # taking random number between 1-3
+
+# creating the game class that will allow us to control the game
+class Game:
+    def __init__(self):
+        self.snake = Snake() # creating the snake object
+        self.fruit = Fruit() # creating the fruit object
+        self.level = 1 # our 1st level
+        self.score = 0 # the score, that will increase after eating the fruit
+        # self.isDead = False
+
+    # update method which responsible to snake moving and collision checker
+    def update(self):
+        self.snake.snakeMoving()
+        self.checkCollision()
+        # self.levelAdding()
+        # self.difficulty()
+
+    def drawElements(self):
+        self.snake.drawingSnake()
+        self.fruit.drawingFruit()
+        self.scoreDrawing()
+    
+    def checkCollision(self):
+        if(self.fruit.pos == self.snake.body[0]): # if the coordinates of our snake and fruit will be equal, snake will eat
+            self.snake.eated = True
+            # the 3 types of the food that gives to us, three types of score
+            if(self.fruit.randomFood == 1):
+                self.score += 1
+            if(self.fruit.randomFood == 2):
+                self.score += 2
+            if(self.fruit.randomFood == 3):
+                self.score += 3
+            self.fruit.randomize() # after eating spawning at the random position
+            self.levelAdding() # check for adding level
+
+        for block in self.snake.body[1:]:
+            if block == self.fruit.pos:
+                self.fruit.randomize()
+
+        for block in wall_coordinates:
+            if block == self.fruit.pos:
+                self.fruit.randomize()
+        
+
+
+    # check for our snake collides with borders
+    def gameOver(self):
+        if self.snake.body[0].x >= 19:
+            return True
+        if self.snake.body[0].x <= 0:
+            return True
+        if self.snake.body[0].y >= 19:
+            return True
+        if self.snake.body[0].y <= 0:
+            return True
+        
+        # check for our snake collides with his body
+        for block in self.snake.body[1:]:
+            if block == self.snake.body[0]:
+                return True
+            
+        for block in wall_coordinates:
+            if block == self.snake.body[0]:
+                return True
+        return False
+    
+    
+    # check for adding level or not for evety 3 points
+    def levelAdding(self):
+        global snake_speed
+        if self.score // 3 > self.level:
+            self.level += 1
+            snake_speed -= 10
+            pygame.time.set_timer(SCREEN_UPDATE, snake_speed) # increasing speed
+    
+    # drawing the UI of our game, such us score and level
+    def scoreDrawing(self):
+        score_text = "Score: " + str(self.score)
+        score_surface = font.render(score_text, True, (56, 74, 12))
+        score_rect = score_surface.get_rect(center = (cell_size * cell_number - 150, 40))
+        screen.blit(score_surface, score_rect)
+
+        level_text = "Level: " + str(self.level)
+        level_surface = font.render(level_text, True, (56, 74, 12))
+        level_rect = level_surface.get_rect(center = (cell_size * cell_number - 150, 70))
+        screen.blit(level_surface, level_rect)
+
+    def spawingWalls(self):
+        if(self.level >= 3):
+            wall_coordinates.append(Vector2(9, 8))
+            wall_coordinates.append(Vector2(9, 9))
+            wall_coordinates.append(Vector2(9, 10))
+            wall_coordinates.append(Vector2(9, 11))
+            for wall in wall1:
+                wall_rect = pygame.Rect(wall.x * cell_size, wall.y * cell_size, cell_size, cell_size)
+                screen.blit(wall_texture, wall_rect)
+        
+        if(self.level >= 4):
+            for wall in range(0, 20):
+                wall_rect = pygame.Rect(0, wall * cell_size, cell_size, cell_size)
+                screen.blit(wall_texture, wall_rect)
+                wall_coordinates.append(Vector2(0, wall))
+        if(self.level >= 5):
+            for wall in range(0, 20):
+                wall_rect = pygame.Rect(19 * cell_size, wall * cell_size, cell_size, cell_size)
+                screen.blit(wall_texture, wall_rect)
+                wall_coordinates.append(Vector2(19, wall))
+        if(self.level >= 6):
+            for wall in range(1, 4):
+                wall_rect = pygame.Rect(wall * cell_size, 3 * cell_size, cell_size, cell_size)
+                screen.blit(wall_texture, wall_rect)
+                wall_coordinates.append(Vector2(wall, 3))
+        if(self.level >= 7):
+            for wall in range(1, 4):
+                wall_rect = pygame.Rect(wall * cell_size, 10 * cell_size, cell_size, cell_size)
+                screen.blit(wall_texture, wall_rect)
+                wall_coordinates.append(Vector2(wall, 10))
+        if(self.level >= 8):
+            for wall in range(1, 4):
+                wall_rect = pygame.Rect(wall * cell_size, 16 * cell_size, cell_size, cell_size)
+                screen.blit(wall_texture, wall_rect)
+                wall_coordinates.append(Vector2(wall, 16))
+        if(self.level >= 9):
+            for wall in range(16, 19):
+                wall_rect = pygame.Rect(wall * cell_size, 3 * cell_size, cell_size, cell_size)
+                screen.blit(wall_texture, wall_rect)
+                wall_coordinates.append(Vector2(wall, 3))
+        if(self.level >= 10):
+            for wall in range(16, 19):
+                wall_rect = pygame.Rect(wall * cell_size, 10 * cell_size, cell_size, cell_size)
+                screen.blit(wall_texture, wall_rect)
+                wall_coordinates.append(Vector2(wall, 10))
+        if(self.level >= 11):
+            for wall in range(16, 19):
+                wall_rect = pygame.Rect(wall * cell_size, 16 * cell_size, cell_size, cell_size)
+                screen.blit(wall_texture, wall_rect)
+                wall_coordinates.append(Vector2(wall, 16))
+
+    def pauseState(self):
+        global isPause
+        if isPause == False:
+            screen.blit(pause, (0, 0, 800, 800))
+            pygame.time.set_timer(SCREEN_UPDATE, 0)
+            isPause = True
         else:
-            snake_body.pop()
-            
-        if not big_fruit_spawn:
-            big_fruit_position = [random.randrange(1, (window_width // 10)) * 10, random.randrange(1, (window_height // 10)) * 10]
-            
-        fruit_spawn = True
-        big_fruit_spawn = True
+            pygame.time.set_timer(SCREEN_UPDATE, snake_speed)
+            isPause = False
 
-        game_window.fill(black)
-        
-        for pos in snake_body:
-            pygame.draw.rect(game_window, red, pygame.Rect(pos[0], pos[1], 10, 10))
-            
-        pygame.draw.rect(game_window, white, pygame.Rect(fruit_position[0], fruit_position[1], 10, 10))
-        pygame.draw.rect(game_window, white, pygame.Rect(big_fruit_position[0], big_fruit_position[1], 20, 20))
 
-        if score % 100 == 0 and score != 0 and score // 100 > len(walls):
-            create_wall()
+clock = pygame.time.Clock()
+cell_size = 40
+cell_number = 20
+direction = Vector2(1, 0) # direction this means to right
+screen = pygame.display.set_mode((cell_size * cell_number, cell_size * cell_number)) # creating screen with are 800x800 or 20x20 cells square
+done = False
 
-        # Отображение счета и т.д
-        show_score(1, white, 'times new roman', 20)
-        show_time(1, red, 'times new roman', 20)
-        show_login(1, white, 'times new roman', 20)
-        show_level(1, white, 'times new roman', 20)
-        
-    if paused:
-        # Отображение изображения паузы
-        game_window.blit(resume_icon if paused else pause_icon, icon_rect)
-   
-    # Обновление экрана
-    pygame.display.update()
 
-    draw_walls()
+font = pygame.font.Font('C:/Users/Admin/Desktop/labs/week1/week 10/font.ttf', 25) # imporing our font, from our file
 
-    snake_speed+=speed
+nowSeconds = int((datetime.datetime.now()).strftime("%S"))
 
-    # Частота обновления кадров
-    fps.tick(snake_speed)
+game = Game() # creating the game object
+snake_speed = 150
+
+wall1 = [Vector2(9, 8), Vector2(9, 9), Vector2(9, 10), Vector2(9, 11)]
+wall_texture = pygame.image.load('C:/Users/Admin/Desktop/labs/week1/week 10/cobble4040.png')
+wall_coordinates = []
+pause = pygame.image.load('C:/Users/Admin/Desktop/labs/week1/week 10/pause.png')
+
+isPause = False
+
+
+SCREEN_UPDATE = pygame.USEREVENT
+pygame.time.set_timer(SCREEN_UPDATE, snake_speed)
+
+
+def name_checker(NAMEBOX):
+    global user_name
+    user_name = str(NAMEBOX.get_value())
+    cnt = 0
+    cur.execute(' SELECT * FROM snake_scores ')
+    data = cur.fetchall()
+
+    for row in data:
+        if user_name == str(row[1]):
+            cnt += 1
+    if cnt > 0:
+        print(f'User with this name is already exist, the level of this user is: {int(row[2]) // 3}, please enter another name: \n')
+    else: start_the_game()
+
+def start_the_game():
+    global done
+    global direction
+    global nowSeconds
+    global seconds
+    global user_name
+    while not done:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                done = True
+            # check for direction
+            if(event.type == SCREEN_UPDATE):
+                game.update()
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                game.pauseState()
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_RIGHT:
+                if direction.x != -1:
+                    direction = Vector2(1, 0)
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_LEFT:
+                if direction.x != 1:
+                    direction = Vector2(-1, 0)
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
+                if direction.y != 1:
+                    direction = Vector2(0, -1)
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
+                if direction.y != -1:
+                    direction = Vector2(0, 1)   
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_i:
+                cur.execute(f''' INSERT INTO snake_scores("user", "user_score") VALUES( '{user_name}', '{game.score}'); ''')
+
+                conn.commit()
+                cur.close()
+                conn.close()
+                done = True
+
+        if(game.gameOver() == True): # if our game over returns true, we will end the game
+
+            cur.execute(f''' INSERT INTO snake_scores("user", "user_score") VALUES( '{user_name}', '{game.score}'); ''')
+
+            conn.commit()
+            cur.close()
+            conn.close()
+            done = True
+
+        # check for to randomly spawn the fruit, if you wont eat the frut after 3 seconds it will be spawned at the random position
+        time = datetime.datetime.now()
+        seconds = int(time.strftime("%S"))
+        if abs(seconds - nowSeconds) > 3:
+            game.fruit.randomize()
+            nowSeconds = seconds
+        screen.fill((175, 215, 70))
+        game.spawingWalls()
+        game.drawElements()
+        # game.update()
+        pygame.display.flip()
+        clock.tick(60)
+
+
+
+menu = pygame_menu.Menu('Welcome', 800, 800,
+                       theme=pygame_menu.themes.THEME_BLUE)
+
+name_box = menu.add.text_input('Name :', default='username')
+menu.add.button('Play', name_checker, name_box)
+menu.add.button('Quit', pygame_menu.events.EXIT)
+menu.mainloop(screen)
+
+# start_the_game()
+pygame.quit()

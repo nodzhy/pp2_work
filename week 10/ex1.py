@@ -1,7 +1,7 @@
 import psycopg2
 import csv
 
-conn = psycopg2.connect(host="localhost", port = "5432", database= "test2", 
+conn = psycopg2.connect(host="localhost", port = "5432", database= "pp2", 
                         user= "postgres", password = "Nurban17."
 )
 
@@ -10,21 +10,21 @@ cur = conn.cursor()
 def inputData():
     name = input("Hello input your name: ")
     number = input("Input your phone number: ")
-    cur.execute(' INSERT INTO postgres.public.phone_book("PersonName", "PhoneNumber") VALUES( %s, %s); ' , (name, number))
+    cur.execute(' INSERT INTO phone_book("PersonName", "PhoneNumber") VALUES( %s, %s); ' , (name, number))
 
 def importFromCSV():
     with open("C:/Users/Admin/Desktop/labs/week1/week 10/info.csv", 'r') as file:
         reader = csv.reader(file)
         for row in reader:
             personName, phoneNumber = row
-            cur.execute(' INSERT INTO postgres.public.phone_book("PersonName", "PhoneNumber") VALUES( %s, %s); ', (personName, phoneNumber))
+            cur.execute(' INSERT INTO phone_book("PersonName", "PhoneNumber") VALUES( %s, %s); ', (personName, phoneNumber))
 
 
 def update_contact(personName, phoneNumber):
-    cur.execute(' UPDATE postgres.public.phone_book SET "PhoneNumber" = %s WHERE "PersonName" = %s ', (phoneNumber, personName))
+    cur.execute(' UPDATE phone_book SET "PhoneNumber" = %s WHERE "PersonName" = %s ', (phoneNumber, personName))
 
 def queryData():
-    cur.execute(' SELECT * FROM postgres.public.phone_book ')
+    cur.execute(' SELECT * FROM phone_book ')
     data = cur.fetchall()
     path = r"C:/Users/Admin/Desktop/labs/week1/week 10/book.txt"
 
@@ -36,10 +36,10 @@ def queryData():
 def deleteData():
     print("Which name do ypu want to delete?\n")
     personName = input()
-    cur.execute(f''' DELETE FROM postgres.public.phone_book WHERE "PersonName"='{personName}' ''')
+    cur.execute(f''' DELETE FROM phone_book WHERE "PersonName"='{personName}' ''')
 
 def deleteAllData():
-    cur.execute(' DELETE FROM postgres.public.phone_book ')
+    cur.execute(' DELETE FROM phone_book ')
 
 done = False
 while not done:
